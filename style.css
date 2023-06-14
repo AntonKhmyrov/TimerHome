@@ -1,0 +1,71 @@
+* {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+}
+
+.container {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   margin: 50px auto;
+   max-width: 544px;
+   width: 100%;
+   gap: 20px;
+   padding: 20px;
+}
+
+.timer-body {
+   display: flex;
+   gap: 10px;
+}
+
+.timer-box {
+   text-align: center;
+   border: 1px solid black;
+   padding: 5px;
+}
+
+.timer-block {
+   width: 150px;
+   min-height: 150px;
+   font-size: 140px;
+}
+
+.seconds {
+   color: green;
+}
+
+.minutes {
+   color: blue;
+}
+
+.hours {
+   color: red;
+}
+
+.timer-txt {
+   font-size: 20px;
+}
+
+.timer-box-btn {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+}
+
+.timer-button,
+.timer-clear-button {
+   width: 100px;
+   max-height: 30px;
+   font-size: 16px;
+   background-color: cadetblue;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+}
+
+.timer-button:active,
+.timer-clear-button:active {
+   transform: scale(1.05);
+}
