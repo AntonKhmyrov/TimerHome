@@ -1,71 +1,96 @@
-const timerBlockSeconds = document.querySelector('.timer-block.seconds');
-const timerBlockMinutes = document.querySelector('.timer-block.minutes');
-const timerBlockHours = document.querySelector('.timer-block.hours');
+const timerBlocks = document.querySelectorAll('.timer-block');
 const startBtn = document.querySelector('.timer-button');
 const clearBtn = document.querySelector('.timer-clear-button');
+
+const maxSecMin = 60;
+const maxHours = 24;
+const daysInMonths = [2, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Количество дней в каждом месяце
+const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const maxMonths = daysInMonths.length;
+const maxYears = Infinity;
+
 let intervalId;
-let seconds = 0;
-let maxSeconds = 60;
-let minutes = 0;
-let maxMinutes = 60;
-let hours = 0;
-let maxHours = 1;
+let timeValues = [0, 0, 0, 0, 1]; // [seconds, minutes, hours, days, months] (изначальный месяц - январь)
 let flag = false;
 
-function startTimer() {
-   intervalId = setInterval(() => {
-      if (seconds < maxSeconds) {
-         seconds++;
-         timerBlockSeconds.textContent = seconds;
-      }
-      if (seconds === maxSeconds) {
-         seconds = 0;
-         minutes++;
-         timerBlockMinutes.textContent = minutes;
-      }
-      if (minutes === maxMinutes) {
-         minutes = 0;
-         hours++;
-         timerBlockHours.textContent = hours;
-      }
-      if (hours === maxHours) {
-         alert(`Прошел ${hours} час`)
-         hours = 0;
-         timerBlockSeconds.textContent = '0';
-         timerBlockMinutes.textContent = '0';
-         timerBlockHours.textContent = '0';
-         startBtn.textContent = 'Start';
-         clearInterval(intervalId);
-      }
-   }, 1000);
-}
+const startTimer = () => {
+   intervalId = setInterval(updateTimer, 1000);
+   toggleButtonState('Stop');
+   flag = true;
+};
 
-function stopTimer() {
+const updateTimer = () => {
+   timeValues[0]++; // Увеличение секунд
+   for (let i = 0; i < timeValues.length; i++) {
+      const maxLimit = getMaxLimit(i);
+      if (timeValues[i] === maxLimit) {
+         timeValues[i] = 0;
+         if (i < timeValues.length - 1) {
+            timeValues[i + 1]++; // Увеличение следующего значения
+         } else {
+            stopTimer();
+            handleTimerCompletion();
+            return;
+         }
+      }
+      timerBlocks[i].textContent = timeValues[i]; // Обновление значения блока таймера
+   }
+   updateMonthName(timeValues[4]);
+};
+
+const getMaxLimit = (index) => {
+   switch (index) {
+      case 0: // Секунды
+         return maxSecMin;
+      case 1: // Минуты
+         return maxSecMin;
+      case 2: // Часы
+         return maxHours;
+      case 3: // Дни
+         return daysInMonths[timeValues[4] - 1];
+      case 4: // Месяцы
+         return maxMonths;
+      default:
+         return Infinity;
+   }
+};
+
+const stopTimer = () => {
    clearInterval(intervalId);
-}
+   flag = false;
+};
 
-function toggleTimer() {
+const toggleTimer = () => {
    if (flag) {
       stopTimer();
-      startBtn.textContent = 'Continue';
+      toggleButtonState('Continue');
    } else {
       startTimer();
-      startBtn.textContent = 'Stop';
    }
-   flag = !flag;
-}
+};
 
-function clearTimer() {
+const resetTimer = () => {
    stopTimer();
-   seconds = 0;
-   minutes = 0;
-   hours = 0;
-   timerBlockSeconds.textContent = '0';
-   timerBlockMinutes.textContent = '0';
-   timerBlockHours.textContent = '0';
-   startBtn.textContent = 'Start';
-   flag = false;
-}
+   timeValues = [0, 0, 0, 0, 1]; // Сброс в изначальное состояние (январь)
+   for (let i = 0; i < timerBlocks.length; i++) {
+      timerBlocks[i].textContent = '0';
+   }
+   updateMonthName(timeValues[4]);
+};
+
+const toggleButtonState = (text) => {
+   startBtn.textContent = text;
+};
+
+const handleTimerCompletion = () => {
+   resetTimer();
+   toggleButtonState('Start');
+};
+
+const updateMonthName = (monthIndex) => {
+   const monthName = monthNames[monthIndex - 1];
+   document.querySelector('.month-name').textContent = monthName;
+};
 
 startBtn.addEventListener('click', toggleTimer);
-clearBtn.addEventListener('click', clearTimer);
+clearBtn.addEventListener('click', resetTimer);
